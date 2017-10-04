@@ -19,7 +19,7 @@ class Connection
 	
 	public function Connect()
 	{
-		$this->Link = mysqli_connect($this->Host, $this->Login, $this->Pass);
+		$this->Link = new mysqli($this->Host, $this->Login, $this->Pass);
 
 		if ($this->Link != null && $this->Database != '')
 		{
@@ -34,7 +34,7 @@ class Connection
 	{
 		if ($this->Link != null)
 		{
-			mysqli_close($this->Link);
+			$this->Link->close();
 			$this->Link = null;
 		}
 	}
@@ -42,26 +42,41 @@ class Connection
 	public function ExecuteDataset($Query)
 	{
 		$Output = Array();
-		$Result = mysqli_query($Query, $this->Link);
-		if ($Result != null)
+
+		if ($this->Link != null)
 		{
-			while ($Row = mysqli_fetch_object($Result))
+			$Result = $this->Link->query($Query);
+
+			if ($Result != null)
 			{
-				$Output[] = $Row;
+				while ($Row = mysqli_fetch_object($Result))
+				{
+					$Output[] = $Row;
+				}
 			}
 		}
+
 		return $Output;
 	}
 
 	public function ExecuteMultiQuery($Query)
 	{
-		$Result = mysql_unbuffered_query($Query, $this->Link);
+		$Result = null;
+
+		if ($this->Link != null)
+		{
+			$Result = $this->Link->multi_query($Query);
+		}
+
 		return $Result;
 	}
 
 	public function GetLastInsertID()
 	{
-		return mysql_insert_id($this->Link);
+		if ($this->Link != null)
+		{
+			return $this->Link->$insert_id;
+		}
 	}
 }
 
