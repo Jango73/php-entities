@@ -78,6 +78,11 @@ class Connection
 			return $this->Link->$insert_id;
 		}
 	}
+
+	public function GetLastError()
+	{
+		return mysqli_error($this->Link);
+	}
 }
 
 ?>
