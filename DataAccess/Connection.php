@@ -16,7 +16,7 @@ class Connection
 		$this->Database = $Database;
 		$this->Link = null;
 	}
-	
+
 	public function Connect()
 	{
 		$this->Link = new mysqli($this->Host, $this->Login, $this->Pass);
@@ -71,11 +71,16 @@ class Connection
 		return $Result;
 	}
 
+	public function Query($Query)
+	{
+		return $this->Link->query($Query);
+	}
+
 	public function GetLastInsertID()
 	{
 		if ($this->Link != null)
 		{
-			return $this->Link->$insert_id;
+			return $this->Link->insert_id;
 		}
 	}
 

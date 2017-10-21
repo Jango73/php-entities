@@ -101,6 +101,26 @@ class Entity
 		return true;
 	}
 
+	public function GetRandomNumberForField($Column, $MaxNumber)
+	{
+		while (true)
+		{
+			$Number = "";
+
+			for ($index = 0; $index < $MaxNumber; $index++)
+			{
+				$Number .= chr(rand(48, 57));
+			}
+
+			if ($this->CheckAvailable($Column,  $Number))
+			{
+				break;
+			}
+		}
+
+		return $Number;
+	}
+
 	public function Persist($IncludeChildren = false)
 	{
 		$Output = "";
@@ -222,7 +242,7 @@ class Entity
 	{
 		$Output = "INSERT INTO " . $this->TableName;
 		$Output .= " ( ";
-		$Fields = GetClassProperties(get_class($this), $types="public");
+		$Fields = GetClassProperties(get_class($this), $types = "public");
 		$First = true;
 
 		foreach ($Fields as $f)
@@ -246,6 +266,11 @@ class Entity
 			$Name = $f->getName();
 			$Value = $f->getValue($this);
 
+			if (is_object($Value) && get_class($Value) == "DateTime")
+			{
+				$Value = $Value->format("Y-m-d H:i:s");
+			}
+
 			if ($Value != null && $this->IsDatabaseField($Name) && $Name != "ID")
 			{
 				if ($First == false) $Output .= ", ";
@@ -262,7 +287,7 @@ class Entity
 	{
 		$Output = "UPDATE " . $this->TableName . " ";
 		$Output .= "SET ";
-		$Fields = GetClassProperties(get_class($this), $types="public");
+		$Fields = GetClassProperties(get_class($this), $types = "public");
 		$First = true;
 
 		foreach ($Fields as $f)
@@ -348,6 +373,11 @@ class Entity
 			if ($Col == $Fld) return true;
 		}
 		return false;
+	}
+
+	public static function GetLastError()
+	{
+		return Entity::$Connection->GetLastError();
 	}
 }
 
